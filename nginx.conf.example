@@ -1,0 +1,45 @@
+# Minimal nginx.conf to run the anti-DDoS Lua fork as a reverse proxy shield.
+#
+# Bind 8080 = the shield, open to the internet.
+# Target app lives on loopback only (never exposed directly).
+# Based on C0nw0nk/Nginx-Lua-Anti-DDoS; shared-memory zones + access hook added here.
+
+worker_processes  1;
+error_log  logs/error.log  info;
+
+events {
+    worker_connections  256;
+}
+
+http {
+    # Shared memory zones required by anti_ddos_challenge.lua
+    lua_shared_dict antiddos 70m;
+    lua_shared_dict antiddos_blocked 70m;
+    lua_shared_dict ddos_counter 10m;
+    lua_shared_dict jspuzzle_tracker 70m;
+
+    upstream demo_api {
+        server 127.0.0.1:3199;
+    }
+
+    server {
+        listen 8080;
+        server_name _;
+
+        # Runs the anti-DDoS challenge (rate limit, WAF, slowloris, JS puzzle) on every request
+        access_by_lua_file /usr/local/openresty/nginx/conf/lua-anti-ddos.lua;
+
+        location / {
+            proxy_pass http://demo_api;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+
+        # Health probe bypasses the challenge
+        location = /__health {
+            default_type application/json;
+            return 200 '{"ok":true,"shield":"nginx-lua-anti-ddos"}';
+        }
+    }
+}

@@ -233,8 +233,8 @@ localized.anti_ddos_table = {
 
 		--Rate limiting settings
 		0.5, --500 millisecond window if using memcache for memory storage use seconds not milliseconds memcache does not support milliseconds
-		10000, --max 10000 requests in 500ms
-		86400, --86400 seconds = 24 hour block time for ip flooding
+		10, --max 10000 requests in 500ms
+		120, --86400 seconds = 24 hour block time for ip flooding
 		localized.ngx_HTTP_CLOSE, --444 connection reset 0 bytes per response
 
 		--SlowHTTP / Slowloris settings
@@ -730,7 +730,7 @@ To find all IP ranges of an ASN use : https://www.enjen.net/asn-blocklist/index.
 localized.ip_whitelist_remote_addr = "auto" --Automatically get the Clients IP address
 --localized.ip_whitelist_remote_addr = localized.ngx_var_remote_addr
 localized.ip_whitelist_block_mode = 0 --0 whitelist acts as a bypass to puzzle auth checks 1 is to enforce only allowing whitelisted addresses access other addresses will be blocked.
-localized.ip_whitelist_bypass_flood_protection = 1 --0 IP's in whitelist can still be banned / blocked for DDoS flooding behaviour 1 IP's bypass the flood detection
+localized.ip_whitelist_bypass_flood_protection = 0 --0 IP's in whitelist can still be banned / blocked for DDoS flooding behaviour 1 IP's bypass the flood detection
 localized.ip_whitelist = {
 "127.0.0.0",
 "127.0.0.1",
@@ -1534,8 +1534,8 @@ Add your ip ranges to the list of who you expect to send you a proxy header.
 Example to test with : curl.exe "http://localhost/" -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" -H "Accept-Language: en-GB,en;q=0.5" -H "Accept-Encoding: gzip, deflate, br, zstd" -H "DNT: 1" -H "Connection: keep-alive" -H "Cookie: name1=1; name2=2; logged_in=1" -H "Upgrade-Insecure-Requests: 1" -H "Sec-Fetch-Dest: document" -H "Sec-Fetch-Mode: navigate" -H "Sec-Fetch-Site: none" -H "Sec-Fetch-User: ?1" -H "Priority: u=0, i" -H "Pragma: no-cache" -H "Cache-Control: no-cache" -H "User-Agent:testagent1" -H "CF-Connecting-IP: 1" -H "X-Forwarded-For: 1" -H "internal:1"
 ]]
 localized.proxy_header_table = {
-"127.0.0.0",
-"127.0.0.1",
+--"127.0.0.0",
+--"127.0.0.1",
 "127.0.0.2",
 "::",
 "::1",
